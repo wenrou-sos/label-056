@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Device {
+  id               String        @id @default(uuid())
+  code             String        @unique
+  type             String
+  floor            String
+  location         String
+  installDate      DateTime?
+  expireDate       DateTime?
+  pressureExpireDate DateTime?
+  lastCleanDate    DateTime?
+  cleanCycleDays   Int?          @default(180)
+  status           String        @default("NORMAL")
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  routeDevices     RouteDevice[]
+  inspections      InspectionRecord[]
+  hazards          Hazard[]
+}
+
+model InspectionRoute {
+  id          String        @id @default(uuid())
+  name        String
+  shift       String
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  devices     RouteDevice[]
+  tasks       InspectionTask[]
+}
+
+model RouteDevice {
+  id         String          @id @default(uuid())
+  routeId    String
+  deviceId   String
+  orderIndex Int
+  route      InspectionRoute @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  device     Device          @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  @@unique([routeId, deviceId])
+}
+
+model InspectionTask {
+  id          String              @id @default(uuid())
+  routeId     String
+  shift       String
+  taskDate    DateTime
+  status      String              @default("PENDING")
+  inspector   String?
+  startTime   DateTime?
+  endTime     DateTime?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  route       InspectionRoute     @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  records     InspectionRecord[]
+}
+
+model InspectionRecord {
+  id          String           @id @default(uuid())
+  taskId      String
+  deviceId    String
+  result      String
+  remark      String?
+  photoUrl    String?
+  inspector   String
+  inspectedAt DateTime         @default(now())
+  task        InspectionTask   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  device      Device           @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  hazard      Hazard?
+}
+
+model Hazard {
+  id             String          @id @default(uuid())
+  title          String
+  description    String?
+  deviceId       String
+  inspectionId   String?         @unique
+  status         String          @default("PENDING_ASSIGN")
+  assignee       String?
+  repairRemark   String?
+  repairPhotoUrl String?
+  repairedAt     DateTime?
+  acceptor       String?
+  acceptRemark   String?
+  acceptedAt     DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  device         Device          @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  inspection     InspectionRecord? @relation(fields: [inspectionId], references: [id], onDelete: SetNull)
+}
