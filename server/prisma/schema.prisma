@@ -64,14 +64,14 @@ model InspectionTask {
 
 model InspectionRecord {
   id          String           @id @default(uuid())
-  taskId      String
+  taskId      String?
   deviceId    String
   result      String
   remark      String?
   photoUrl    String?
   inspector   String
   inspectedAt DateTime         @default(now())
-  task        InspectionTask   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  task        InspectionTask?  @relation(fields: [taskId], references: [id], onDelete: Cascade)
   device      Device           @relation(fields: [deviceId], references: [id], onDelete: Cascade)
   hazard      Hazard?
 }

@@ -69,22 +69,23 @@ router.put('/:id', async (req, res) => {
     const { name, shift, description, deviceIds = [] } = req.body;
     const routeId = req.params.id;
 
-    await prisma.$transaction(async (tx) => {
-      await tx.routeDevice.deleteMany({ where: { routeId } });
-      await tx.inspectionRoute.update({
-        where: { id: routeId },
-        data: {
-          name,
-          shift,
-          description,
-          devices: {
-            create: deviceIds.map((deviceId, idx) => ({
-              deviceId,
-              orderIndex: idx
-            }))
-          }
-        }
+    await prisma.routeDevice.deleteMany({ where: { routeId } });
+
+    const routeDevicesData = deviceIds.map((deviceId, idx) => ({
+      routeId,
+      deviceId,
+      orderIndex: idx
+    }));
+
+    if (routeDevicesData.length > 0) {
+      await prisma.routeDevice.createMany({
+        data: routeDevicesData
       });
+    }
+
+    await prisma.inspectionRoute.update({
+      where: { id: routeId },
+      data: { name, shift, description }
     });
 
     const route = await prisma.inspectionRoute.findUnique({

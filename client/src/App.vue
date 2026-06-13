@@ -44,15 +44,23 @@
             </n-layout>
 
             <template v-else>
-              <div class="mobile-content" style="height: calc(100vh - 56px); overflow: auto; padding: 12px">
+              <div class="mobile-content" style="height: calc(100vh - 60px); overflow: auto; padding: 12px">
                 <router-view />
               </div>
-              <n-tab-bar
-                :options="mobileTabs"
-                :value="currentMobileTab"
-                @update:value="handleMobileTab"
-                style="position: fixed; bottom: 0; width: 100%; border-top: 1px solid #e0e0e0"
-              />
+              <div class="mobile-tab-bar">
+                <div
+                  v-for="tab in mobileTabs"
+                  :key="tab.key"
+                  class="mobile-tab-item"
+                  :class="{ active: currentMobileTab === tab.key }"
+                  @click="handleMobileTab(tab.key)"
+                >
+                  <n-icon :size="20">
+                    <component :is="tabIconMap[tab.key]" />
+                  </n-icon>
+                  <span class="tab-label">{{ tab.label }}</span>
+                </div>
+              </div>
             </template>
           </div>
         </n-dialog-provider>
@@ -71,7 +79,8 @@ import {
   MapOutline,
   ClipboardOutline,
   WarningOutline,
-  NotificationsOutline
+  NotificationsOutline,
+  QrCodeOutline
 } from '@vicons/ionicons5'
 
 const router = useRouter()
@@ -102,6 +111,14 @@ const mobileTabs = [
   { label: '扫码', key: 'scan' },
   { label: '隐患', key: 'hazards' }
 ]
+
+const tabIconMap = {
+  dashboard: HomeOutline,
+  devices: ConstructOutline,
+  tasks: ClipboardOutline,
+  scan: QrCodeOutline,
+  hazards: WarningOutline
+}
 
 const currentRoute = computed(() => route.name)
 const currentMobileTab = computed(() => route.name || 'dashboard')
@@ -163,5 +180,39 @@ body {
 
 .mobile-content {
   background: #f5f5f5;
+}
+
+.mobile-tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 100;
+}
+
+.mobile-tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.mobile-tab-item.active {
+  color: #e04040;
+}
+
+.mobile-tab-item .tab-label {
+  font-size: 11px;
+  margin-top: 2px;
 }
 </style>

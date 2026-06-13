@@ -186,7 +186,7 @@ const deviceColumns = [
 
 function goInspect(deviceCode) {
   if (deviceCode) {
-    router.push(`/scan/${deviceCode}`)
+    router.push({ name: 'scan-inspect', params: { code: deviceCode }, query: { taskId: route.params.id } })
   }
 }
 

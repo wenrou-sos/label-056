@@ -56,10 +56,12 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useMessage } from 'naive-ui'
 import { ScanOutline, SearchOutline } from '@vicons/ionicons5'
 import api from '../api'
 
 const router = useRouter()
+const message = useMessage()
 const deviceCode = ref('')
 const scanning = ref(false)
 const videoRef = ref(null)
@@ -94,7 +96,7 @@ async function startCamera() {
     }
     scanning.value = true
   } catch (err) {
-    window.$message?.error('无法访问摄像头: ' + err.message)
+    message.error('无法访问摄像头: ' + err.message)
   }
 }
 

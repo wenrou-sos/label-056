@@ -48,11 +48,12 @@
 <script setup>
 import { ref, h, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { NTag, NButton } from 'naive-ui'
+import { NTag, NButton, useMessage } from 'naive-ui'
 import dayjs from 'dayjs'
 import api from '../api'
 
 const router = useRouter()
+const message = useMessage()
 const expiredDevices = ref([])
 const expiringDevices = ref([])
 const cleanDevices = ref([])
@@ -133,7 +134,7 @@ async function loadReminders() {
     expiringDevices.value = data.expiringDevices || []
     cleanDevices.value = data.cleanRemindDevices || []
   } catch (e) {
-    window.$message?.error('加载提醒数据失败')
+    message.error('加载提醒数据失败')
   }
 }
 

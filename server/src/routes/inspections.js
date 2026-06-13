@@ -5,16 +5,19 @@ const router = express.Router();
 router.post('/', async (req, res) => {
   try {
     const { taskId, deviceId, result, remark, photoUrl, inspector } = req.body;
+    const data = {
+      deviceId,
+      result,
+      remark,
+      photoUrl,
+      inspector
+    };
+    if (taskId) {
+      data.taskId = taskId;
+    }
     const record = await prisma.inspectionRecord.create({
-      data: {
-        taskId,
-        deviceId,
-        result,
-        remark,
-        photoUrl,
-        inspector
-      },
-      include: { device: true }
+      data,
+      include: { device: true, task: true }
     });
     res.json(record);
   } catch (err) {

@@ -59,6 +59,7 @@
 <script setup>
 import { ref, reactive, onMounted, h } from 'vue'
 import { NTag, NButton, NSpace, useMessage } from 'naive-ui'
+import dayjs from 'dayjs'
 import api from '../api/index.js'
 
 const message = useMessage()
@@ -97,8 +98,18 @@ const deviceOptions = ref([])
 
 const columns = [
   { title: '标题', key: 'title', ellipsis: { tooltip: true } },
-  { title: '设备编号', key: 'deviceId', width: 100 },
-  { title: '设备位置', key: 'deviceLocation', width: 120, render: (row) => row.Device?.location || '-' },
+  {
+    title: '设备编号',
+    key: 'deviceCode',
+    width: 120,
+    render: (row) => row.device?.code || '-'
+  },
+  {
+    title: '设备位置',
+    key: 'deviceLocation',
+    width: 140,
+    render: (row) => row.device?.location || '-'
+  },
   {
     title: '状态', key: 'status', width: 100,
     render: (row) => h(NTag, { type: statusMap[row.status]?.type, size: 'small' }, { default: () => statusMap[row.status]?.text || row.status })
@@ -106,7 +117,12 @@ const columns = [
   { title: '派单人', key: 'assignee', width: 80, render: (row) => row.assignee || '-' },
   { title: '维修说明', key: 'repairRemark', width: 140, ellipsis: { tooltip: true }, render: (row) => row.repairRemark || '-' },
   { title: '验收人', key: 'acceptor', width: 80, render: (row) => row.acceptor || '-' },
-  { title: '创建时间', key: 'createdAt', width: 160 },
+  {
+    title: '创建时间',
+    key: 'createdAt',
+    width: 160,
+    render: (row) => row.createdAt ? dayjs(row.createdAt).format('YYYY-MM-DD HH:mm') : '-'
+  },
   {
     title: '操作', key: 'actions', width: 100, fixed: 'right',
     render: (row) => {

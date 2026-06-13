@@ -168,7 +168,7 @@ CREATE DATABASE fire_inspection CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
 配置数据库连接（编辑 `server/.env`）：
 ```env
 DATABASE_URL="mysql://用户名:密码@localhost:3306/fire_inspection?schema=public"
-PORT=3000
+PORT=3002
 ```
 
 ### 3. 安装依赖
@@ -204,7 +204,7 @@ npm run seed
 # 启动后端服务 (终端1)
 cd server
 npm run dev
-# 服务运行在 http://localhost:3000
+# 服务运行在 http://localhost:3002
 
 # 启动前端服务 (终端2)
 cd client

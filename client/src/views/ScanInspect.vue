@@ -54,6 +54,7 @@
               :action="uploadUrl"
               :max="1"
               accept="image/*"
+              name="photo"
               @finish="handleUploadFinish"
               list-type="image-card"
             >
@@ -109,11 +110,13 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useMessage } from 'naive-ui'
 import dayjs from 'dayjs'
 import api from '../api'
 
 const route = useRoute()
 const router = useRouter()
+const message = useMessage()
 const isMobile = computed(() => window.innerWidth < 768)
 
 const device = ref(null)
@@ -227,14 +230,14 @@ async function submitInspect() {
                      form.value.result === 'EXPIRED' ? 'EXPIRED' : 'DAMAGED'
     await api.put(`/devices/${device.value.id}`, { status: newStatus })
 
-    window.$message?.success('巡检记录提交成功')
+    message.success('巡检记录提交成功')
     if (taskId) {
       router.push({ name: 'task-detail', params: { id: taskId } })
     } else {
       router.push({ name: 'scan' })
     }
   } catch (e) {
-    window.$message?.error(e.message || '提交失败')
+    message.error(e.message || '提交失败')
   } finally {
     submitting.value = false
   }

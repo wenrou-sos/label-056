@@ -17,8 +17,8 @@
     </n-space>
 
     <n-spin :show="loading">
-      <n-grid :cols="1 m:2" :x-gap="16" :y-gap="16" responsive="screen" item-responsive>
-        <n-grid-item v-for="item in routes" :key="item.id">
+      <div class="route-grid">
+        <div v-for="item in routes" :key="item.id" class="route-card-item">
           <n-card hoverable size="small">
             <template #header>
               <n-space align="center" :size="8">
@@ -48,8 +48,8 @@
             </div>
             <n-empty v-else description="暂无设备" size="small" />
           </n-card>
-        </n-grid-item>
-      </n-grid>
+        </div>
+      </div>
       <n-empty v-if="!loading && !routes.length" description="暂无路线数据" style="margin-top: 40px" />
     </n-spin>
 
@@ -65,13 +65,12 @@
           <n-input v-model:value="form.description" type="textarea" placeholder="请输入描述" :rows="2" />
         </n-form-item>
         <n-form-item label="选择设备" path="deviceIds">
-          <n-transfer
+          <n-select
             v-model:value="form.deviceIds"
-            :options="deviceTransferOptions"
-            source-filterable
-            source-title="可选设备"
-            target-title="已选设备"
-            virtual-scroll
+            :options="deviceSelectOptions"
+            multiple
+            filterable
+            placeholder="请选择巡检设备"
           />
         </n-form-item>
       </n-form>
@@ -135,7 +134,7 @@ const rules = {
   shift: { required: true, message: '请选择班次', trigger: 'change' }
 }
 
-const deviceTransferOptions = computed(() =>
+const deviceSelectOptions = computed(() =>
   devices.value.map(d => ({
     label: `${d.code}（${deviceTypeLabels[d.type] || d.type}）${d.location ? ' - ' + d.location : ''}`,
     value: d.id
@@ -193,7 +192,7 @@ function openEditModal(route) {
     name: route.name,
     shift: route.shift,
     description: route.description || '',
-    deviceIds: route.devices ? route.devices.map(d => d.id) : []
+    deviceIds: route.devices ? route.devices.map(d => d.deviceId) : []
   }
   showModal.value = true
 }
@@ -251,3 +250,21 @@ onMounted(() => {
   fetchDevices()
 })
 </script>
+
+<style scoped>
+.route-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .route-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.route-card-item {
+  width: 100%;
+}
+</style>
