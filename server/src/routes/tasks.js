@@ -46,12 +46,16 @@ const generateDailyTasks = async () => {
 router.get('/', async (req, res) => {
   try {
     await generateDailyTasks();
-    const { status, shift, date } = req.query;
+    const { status, shift, date, dateStart, dateEnd } = req.query;
     const where = {};
     if (status && status !== 'ALL') where.status = status;
     if (shift && shift !== 'ALL') where.shift = shift;
     if (date) {
       where.taskDate = normalizeDate(date);
+    } else if (dateStart || dateEnd) {
+      where.taskDate = {};
+      if (dateStart) where.taskDate.gte = normalizeDate(dateStart);
+      if (dateEnd) where.taskDate.lte = normalizeDate(dateEnd);
     }
 
     const tasks = await prisma.inspectionTask.findMany({

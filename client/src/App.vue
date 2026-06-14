@@ -80,7 +80,8 @@ import {
   ClipboardOutline,
   WarningOutline,
   NotificationsOutline,
-  QrCodeOutline
+  QrCodeOutline,
+  CalendarOutline
 } from '@vicons/ionicons5'
 
 const router = useRouter()
@@ -100,6 +101,7 @@ const menuOptions = [
   { label: '设备台账', key: 'devices', icon: renderIcon(ConstructOutline) },
   { label: '巡检路线', key: 'routes', icon: renderIcon(MapOutline) },
   { label: '巡检任务', key: 'tasks', icon: renderIcon(ClipboardOutline) },
+  { label: '巡检日历', key: 'calendar', icon: renderIcon(CalendarOutline) },
   { label: '隐患管理', key: 'hazards', icon: renderIcon(WarningOutline) },
   { label: '到期提醒', key: 'reminders', icon: renderIcon(NotificationsOutline) }
 ]
@@ -129,6 +131,7 @@ const currentPageTitle = computed(() => {
     devices: '设备台账',
     routes: '巡检路线',
     tasks: '巡检任务',
+    calendar: '巡检日历',
     scan: '扫码巡检',
     hazards: '隐患管理',
     reminders: '到期提醒'

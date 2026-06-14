@@ -45,6 +45,11 @@ const routes = [
     path: '/reminders',
     name: 'reminders',
     component: () => import('../views/Reminders.vue')
+  },
+  {
+    path: '/calendar',
+    name: 'calendar',
+    component: () => import('../views/Calendar.vue')
   }
 ]
 
