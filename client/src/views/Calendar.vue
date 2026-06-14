@@ -216,6 +216,25 @@ function getDayTaskCount(year, month, date) {
   return getDayTasks(year, month, date).length
 }
 
+function isTaskCompleted(task) {
+  if (task.status === 'COMPLETED') return true
+  const total = task.route?.devices?.length || 0
+  const checked = task.records?.length || 0
+  return total > 0 && checked === total
+}
+
+function getTaskProgress(task) {
+  const total = task.route?.devices?.length || 0
+  if (total === 0) return { total: 0, checked: 0 }
+  if (task.status === 'COMPLETED') return { total, checked: total }
+  return { total, checked: task.records?.length || 0 }
+}
+
+function isTaskStarted(task) {
+  if (task.status === 'COMPLETED' || task.status === 'IN_PROGRESS') return true
+  return (task.records?.length || 0) > 0
+}
+
 function getDayShiftTasks(year, month, date) {
   const tasks = getDayTasks(year, month, date)
   const shifts = ['MORNING', 'AFTERNOON', 'NIGHT']
@@ -223,11 +242,20 @@ function getDayShiftTasks(year, month, date) {
   for (const shift of shifts) {
     const shiftTasks = tasks.filter(t => t.shift === shift)
     if (shiftTasks.length > 0) {
-      const total = shiftTasks.reduce((s, t) => s + (t.route?.devices?.length || 0), 0)
-      const checked = shiftTasks.reduce((s, t) => s + (t.records?.length || 0), 0)
+      let total = 0
+      let checked = 0
+      let allDone = true
+      let anyStarted = false
+      for (const t of shiftTasks) {
+        const prog = getTaskProgress(t)
+        total += prog.total
+        checked += prog.checked
+        if (isTaskCompleted(t) === false) allDone = false
+        if (isTaskStarted(t)) anyStarted = true
+      }
       let status = 'pending'
-      if (total > 0 && checked === total) status = 'completed'
-      else if (checked > 0) status = 'partial'
+      if (allDone && total > 0) status = 'completed'
+      else if (anyStarted) status = 'partial'
       result.push({ shift, total, checked, status })
     }
   }
@@ -237,11 +265,18 @@ function getDayShiftTasks(year, month, date) {
 function getDayStatus(year, month, date) {
   const tasks = getDayTasks(year, month, date)
   if (!tasks.length) return 'none'
-  const total = tasks.reduce((s, t) => s + (t.route?.devices?.length || 0), 0)
-  const checked = tasks.reduce((s, t) => s + (t.records?.length || 0), 0)
-  if (total === 0) return 'none'
-  if (checked === total) return 'completed'
-  if (checked > 0) return 'partial'
+  let allDone = true
+  let anyStarted = false
+  let hasTotal = false
+  for (const t of tasks) {
+    const prog = getTaskProgress(t)
+    if (prog.total > 0) hasTotal = true
+    if (isTaskCompleted(t) === false) allDone = false
+    if (isTaskStarted(t)) anyStarted = true
+  }
+  if (!hasTotal) return 'none'
+  if (allDone) return 'completed'
+  if (anyStarted) return 'partial'
   return 'pending'
 }
 
